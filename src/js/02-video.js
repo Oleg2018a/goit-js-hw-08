@@ -3,27 +3,21 @@ import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
 const iframe = document.querySelector('iframe');
 const player = new Player(iframe);
+const STORAGE_KEY = 'videoplayer-current-time';
 
 player.on('timeupdate', function (data) {
   const currentTime = data.seconds;
   throttledUpdateTime(currentTime);
 });
 
-window.addEventListener('beforeunload', function () {
-  player.getCurrentTime().then(function (currentTime) {
-    localStorage.setItem('videoplayer-current-time', currentTime);
-  });
-});
 const throttledUpdateTime = throttle(function (currentTime) {
-  localStorage.setItem('videoplayer-current-time', currentTime);
+  localStorage.setItem('STORAGE_KEY', currentTime);
 }, 1000);
 
 window.addEventListener('load', function () {
-  const savedTime = this.localStorage.getItem('videoplayer-current-time');
+  const savedTime = this.localStorage.getItem('STORAGE_KEY');
   if (savedTime) {
-    player.setCurrentTime(parseFloat(savedTime)).catch(function (error) {
-      console.error('setCurrentTime failed:', error.name);
-    });
+    player.setCurrentTime(savedTime);
   }
 });
 
